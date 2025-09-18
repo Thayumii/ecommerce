@@ -1,7 +1,6 @@
 package com.projeto.loja.model;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 public class Cliente {
@@ -14,9 +13,6 @@ public class Cliente {
     private String email;
     private String senha;
     private String endereco;
-
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    private List<Carrinho> carrinhos;
 
     public Long getId() {
         return id;
@@ -51,12 +47,5 @@ public class Cliente {
     }
     public void setEndereco(String endereco) {
         this.endereco = endereco;
-    }
-
-    public List<Carrinho> getCarrinhos() {
-        return carrinhos;
-    }
-    public void setCarrinhos(List<Carrinho> carrinhos) {
-        this.carrinhos = carrinhos;
     }
 }
