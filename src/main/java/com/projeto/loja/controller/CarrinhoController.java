@@ -1,7 +1,6 @@
 package com.projeto.loja.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.loja.dto.CarrinhoDTO;
 import com.projeto.loja.model.Carrinho;
 import com.projeto.loja.service.CarrinhoService;
 
@@ -26,24 +26,27 @@ public class CarrinhoController {
     }
 
     @PostMapping
-    public Carrinho criarCarrinho(@RequestBody Carrinho carrinho) {
-        return carrinhoService.salvar(carrinho);
+    public CarrinhoDTO criarCarrinho(@RequestBody Carrinho carrinho) {
+        Carrinho salvo = carrinhoService.salvar(carrinho);
+        return CarrinhoDTO.fromEntity(salvo);
     }
 
     @GetMapping
-    public List<Carrinho> listaCarrinho(){
-        return carrinhoService.listar();
+    public List<CarrinhoDTO> listaCarrinho(){
+        return carrinhoService.listar().stream().map(CarrinhoDTO::fromEntity).toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<Carrinho> buscarPorId(@PathVariable Long id) {
-        return carrinhoService.buscarPorId(id);
+    public CarrinhoDTO buscarPorId(@PathVariable Long id) {
+        Carrinho carrinho = carrinhoService.buscarPorId(id).orElseThrow(() -> new RuntimeException("Carrinho não encontrado"));
+        return CarrinhoDTO.fromEntity(carrinho);
     }
     
     @PutMapping("/{id}")
-    public Carrinho atualizaCarrinho(@PathVariable Long id, @RequestBody Carrinho carrinho) {
+    public CarrinhoDTO atualizaCarrinho(@PathVariable Long id, @RequestBody Carrinho carrinho) {
         carrinho.setId(id);
-        return carrinhoService.salvar(carrinho);
+        Carrinho atualizado = carrinhoService.salvar(carrinho);
+        return CarrinhoDTO.fromEntity(atualizado);
     }
 
     @DeleteMapping("/{id}")

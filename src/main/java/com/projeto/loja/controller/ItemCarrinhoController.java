@@ -1,7 +1,7 @@
 package com.projeto.loja.controller;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.loja.dto.ItemCarrinhoDTO;
 import com.projeto.loja.model.ItemCarrinho;
 import com.projeto.loja.service.ItemCarrinhoService;
 
@@ -26,24 +27,27 @@ public class ItemCarrinhoController {
     }
 
     @PostMapping
-    public ItemCarrinho criarItemCarrinho(@RequestBody ItemCarrinho itemCarrinho) {
-        return itemCarrinhoService.salvarItemCarrinho(itemCarrinho);
+    public ItemCarrinhoDTO criarItemCarrinho(@RequestBody ItemCarrinho itemCarrinho) {
+        ItemCarrinho salvo =  itemCarrinhoService.salvarItemCarrinho(itemCarrinho);
+        return ItemCarrinhoDTO.fromEntity(salvo);
     }
 
     @GetMapping
-    public List<ItemCarrinho> listarItemCarrinhos() {
-       return itemCarrinhoService.listarItemCarrinhos(); 
+    public List<ItemCarrinhoDTO> listarItemCarrinhos() {
+       return itemCarrinhoService.listarItemCarrinhos().stream().map(ItemCarrinhoDTO::fromEntity).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public Optional<ItemCarrinho> buscarPorId(@PathVariable Long id) {
-        return itemCarrinhoService.buscarPorId(id);
+    public ItemCarrinhoDTO buscarPorId(@PathVariable Long id) {
+        ItemCarrinho item = itemCarrinhoService.buscarPorId(id).orElseThrow(() -> new RuntimeException("Item do carrinho não encontrado"));
+        return ItemCarrinhoDTO.fromEntity(item);
     }
 
     @PutMapping("/{id}")
-    public ItemCarrinho atualItemCarrinho(@PathVariable Long id, @RequestBody ItemCarrinho itemCarrinho) {
+    public ItemCarrinhoDTO atualItemCarrinho(@PathVariable Long id, @RequestBody ItemCarrinho itemCarrinho) {
         itemCarrinho.setId(id);
-        return itemCarrinhoService.salvarItemCarrinho(itemCarrinho);
+        ItemCarrinho atualizado =  itemCarrinhoService.salvarItemCarrinho(itemCarrinho);
+        return ItemCarrinhoDTO.fromEntity(atualizado);
     }
 
     @DeleteMapping("/{id}")

@@ -1,7 +1,7 @@
 package com.projeto.loja.controller;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.loja.dto.ClienteDTO;
 import com.projeto.loja.model.Cliente;
 import com.projeto.loja.service.ClienteService;
 
@@ -24,18 +25,20 @@ public class ClienteController {
     }
 
     @PostMapping
-    public Cliente criar(@RequestBody Cliente cliente) {
-        return clienteService.salvar(cliente);
+    public ClienteDTO criar(@RequestBody ClienteDTO clienteDTO) {
+        Cliente salvo = clienteService.salvar(clienteDTO.toEntity());
+        return ClienteDTO.fromEntity(salvo);
     }
 
     @GetMapping
-    public List<Cliente> listar() {
-        return clienteService.listarTodos();
+    public List<ClienteDTO> listar() {
+        return clienteService.listarTodos().stream().map(ClienteDTO::fromEntity).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public Optional<Cliente> buscarPorId(@PathVariable Long id) {
-        return clienteService.buscarPorId(id);
+    public ClienteDTO buscarPorId(@PathVariable Long id) {
+        Cliente cliente = clienteService.buscarPorId(id).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        return ClienteDTO.fromEntity(cliente);
     }
 
     @DeleteMapping("/{id}")

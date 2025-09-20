@@ -3,11 +3,12 @@ package com.projeto.loja.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.loja.dto.ProdutoDTO;
 import com.projeto.loja.model.Produto;
 import com.projeto.loja.service.ProdutoService;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,24 +29,27 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public Produto criarProduto(@RequestBody Produto produto) {
-        return produtoService.salvar(produto);
+    public ProdutoDTO criarProduto(@RequestBody Produto produto) {
+        Produto salvo = produtoService.salvar(produto);
+        return ProdutoDTO.fromEntity(salvo);
     }
 
     @GetMapping
-    public List<Produto> listaProdutos() {
-        return produtoService.listarTodos();
+    public List<ProdutoDTO> listaProdutos() {
+        return produtoService.listarTodos().stream().map(ProdutoDTO::fromEntity).collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public Optional<Produto> buscarPorId(@PathVariable Long id) {
-        return produtoService.buscarPorId(id);
+    public ProdutoDTO buscarPorId(@PathVariable Long id) {
+        Produto produto = produtoService.buscarPorId(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        return ProdutoDTO.fromEntity(produto);
     }
 
     @PutMapping("/{id}")
-    public Produto atualizaProduto(@PathVariable Long id, @RequestBody Produto produto) {
+    public ProdutoDTO atualizaProduto(@PathVariable Long id, @RequestBody Produto produto) {
         produto.setId(id);
-        return produtoService.salvar(produto);
+        Produto atualizado = produtoService.salvar(produto);
+        return ProdutoDTO.fromEntity(atualizado);
     }
 
     @DeleteMapping("/{id}")
